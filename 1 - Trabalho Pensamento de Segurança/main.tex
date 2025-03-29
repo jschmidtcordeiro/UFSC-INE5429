@@ -1,0 +1,73 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{parskip}
+
+\geometry{a4paper, margin=2.5cm}
+
+\begin{document}
+
+\begin{center}
+    \textbf{Disciplina: INE5429} \hspace{2cm} \textbf{Semestre: 2025.1} \\
+    \textbf{Profs.: Jean Everson Martina e Thaís Bardini Idalino} \\
+    \textbf{Aluno: João Pedro Schmidt Cordeiro} \\
+    \textbf{Turma: 07208}
+\end{center}
+
+\vspace{2cm}
+
+\section{Sistema de Clusters da Empresa}
+
+O sistema analisado é o sistema de clusters da empresa em que trabalho. Este sistema é composto por quatro clusters, sendo três de desenvolvimento e um de produção. Em cada cluster, uma série de aplicações são executadas, utilizando uma arquitetura baseada em containers orquestrados via Kubernetes.
+
+\section{Ativos}
+
+Os principais ativos deste sistema são:
+\begin{itemize}
+    \item Dados sensíveis dos clientes que utilizam nossas soluções
+    \item Disponibilidade e continuidade das aplicações
+    \item Infraestrutura computacional
+    \item Conhecimento sobre a arquitetura e funcionamento do sistema
+\end{itemize}
+
+\section{Adversários}
+
+Os potenciais adversários do sistema podem ser classificados em:
+\begin{itemize}
+    \item Desenvolvedores das aplicações do sistema
+    \item Administradores do cluster
+    \item Adversários externos com interesse em acessar a infraestrutura
+\end{itemize}
+
+\section{Gerenciamento de Risco}
+
+Analisando os ativos e adversários, o risco de segurança com menor probabilidade de ocorrência é a invasão do cluster por adversários externos. Esta avaliação é baseada nas medidas implementadas pela equipe de administração da infraestrutura, que inclui restrições de acesso externo aos servidores e isolamento das aplicações em pods sem permissões de administrador.
+
+A utilização dos recursos do cluster para fins pessoais representa um risco que, inicialmente, pode parecer de baixo impacto quando considerado isoladamente. No entanto, este risco se torna mais significativo quando associado aos outros ativos mencionados. A probabilidade de ocorrência é reduzida devido às consequências severas para o usuário interno, que podem incluir demissão, processo judicial e até prisão.
+
+O mesmo princípio de gerenciamento de risco aplica-se aos desenvolvedores das aplicações, cujo acesso é ainda mais restrito comparado aos administradores do cluster.
+
+O risco de replicação da infraestrutura por adversários internos apresenta uma complexidade particular. Embora o conhecimento técnico necessário esteja disponível para desenvolvedores e administradores, a probabilidade de ocorrência é considerada moderada devido às barreiras legais e éticas envolvidas. O impacto potencial é significativo, pois poderia resultar em vantagem competitiva indevida para concorrentes.
+
+\section{Contra Medidas}
+
+Para proteger os dados sensíveis dos clientes, implementamos um mecanismo de criptografia nas aplicações, impedindo que desenvolvedores e administradores acessem os dados em texto puro. Como não é possível aplicar criptografia a todos os tipos de dados, optamos por limitar o acesso dos desenvolvedores aos bancos de dados, reduzindo assim o número de pessoas com acesso aos dados sensíveis. Esta medida, contudo, não é eficaz contra administradores do cluster.
+
+Para prevenir interrupções nas aplicações, utilizamos Infrastructure as Code (IaC) nos clusters. Todas as alterações nos ambientes são registradas, permitindo rollbacks rápidos e identificação do responsável por mudanças maliciosas. Embora ainda exista um usuário admin que poderia ser utilizado para ataques, o custo/benefício de sua modificação não é justificável.
+
+A utilização de recursos do cluster para fins não institucionais é monitorada através de verificações periódicas de gastos por ambiente. Esta medida é efetiva para identificar aplicações desconhecidas que consumam recursos excessivos, resultando em gastos significativos. No entanto, o custo/benefício desta ação não é viável quando a utilização de recursos é baixa, pois o custo da investigação superaria as perdas potenciais.
+
+Para mitigar o risco de replicação da infraestrutura, implementamos acordos de confidencialidade e políticas de segurança que estabelecem claramente as responsabilidades e consequências para violações. Estes documentos são revisados periodicamente e assinados por todos os funcionários com acesso ao sistema, criando uma camada adicional de proteção legal e ética contra o uso indevido do conhecimento técnico.
+
+\section{Custo/Benefício}
+
+A análise de custo/benefício das medidas de segurança implementadas revela diferentes níveis de eficiência. A implementação de IaC apresenta um excelente custo/benefício, pois além de prevenir interrupções, fornece um histórico completo de alterações e permite recuperação rápida de incidentes. O investimento inicial na implementação é compensado pela redução significativa de tempo de resolução de problemas e pela capacidade de auditoria.
+
+A limitação de acesso aos dados sensíveis, embora não seja uma solução perfeita, oferece um bom custo/benefício. O custo de implementação é relativamente baixo, considerando a proteção que oferece contra a maioria dos desenvolvedores. No entanto, a existência de pontos cegos, como o acesso dos administradores, indica que esta medida deve ser complementada com outras estratégias de segurança.
+
+O monitoramento de recursos do cluster apresenta um custo/benefício variável. Para grandes volumes de recursos, o investimento em ferramentas de monitoramento e análise é justificado pela proteção contra uso indevido. Por outro lado, para ambientes menores, o custo de implementação e manutenção de sistemas de monitoramento pode superar os benefícios potenciais.
+
+A decisão de não implementar medidas adicionais contra a replicação da infraestrutura por adversários internos é baseada em uma análise de custo/benefício. A probabilidade e o impacto deste tipo de ataque são considerados baixos em comparação com o custo de implementação de medidas preventivas adicionais. Os controles existentes, como políticas de confidencialidade e consequências legais, são considerados suficientes para o nível de risco aceitável.
+
+\end{document}
