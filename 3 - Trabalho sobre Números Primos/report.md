@@ -130,6 +130,16 @@ Tempo médio para geração de números pseudoaleatórios de diferentes tamanhos
 
 *Cada medição representa a média de 10 execuções.*
 
+## Análise
+
+Foi interessante perceber a grande diferença, que era esperada, entre o resultado de geração de números pseudo-aleatórios ao utilizar os algoritmos de Xorshift e de Blum Blum Shub. Em média, o algoritmo Blum Blum Shub é aproximadamente 244 vezes mais lento que o Xorshift128 (o mais lento entre os Xorshifts). Entendemos que essa lentidão é decorrente da diferença de custo computacional das operações realizadas em cada um dos algoritmos, as operações do Xorshift são muito mais simples que as do Blum Blum Shub.
+
+Também podemos avaliar essa diferença entre os algoritmos ao analisar a complexidade de cada um. O Xorshift possui uma complexidade temporal de O(1), pois independentemente do tamanho do número gerado, ele realiza apenas um número fixo de operações bit a bit (XOR e deslocamentos). Essas operações são extremamente eficientes em hardware moderno.
+
+Por outro lado, o Blum Blum Shub possui uma complexidade temporal de O(k log n), onde k é o número de bits a serem gerados e n é o módulo utilizado no algoritmo. Cada bit gerado requer uma operação de quadrado modular, que é computacionalmente cara, especialmente para números grandes. Além disso, o BBS depende de operações aritméticas de precisão arbitrária, que são intrinsecamente mais lentas que as operações bit a bit utilizadas pelo Xorshift.
+
+Esta diferença de complexidade explica claramente a discrepância de desempenho observada nos experimentos, onde o BBS se torna progressivamente mais lento à medida que o tamanho dos números aumenta.
+
 # Numeros primos
 
 ## Teste de Primalidade de Fermat
