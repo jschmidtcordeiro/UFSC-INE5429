@@ -21,3 +21,27 @@
 ### Referência 5: Blackman, D., & Vigna, S. (2018)
 - Parágrafo 7: Informações sobre as variantes mais recentes Xorshift+ e Xoroshiro
 - Parágrafo 8: Discussões sobre aplicações práticas das versões mais modernas do algoritmo
+
+## Blum Blum Shub
+
+### Referência 1: Blum, L., Blum, M., & Shub, M. (1986)
+- Parágrafo 1: Informação histórica sobre a criação do algoritmo em 1986
+- Parágrafo 2-3: Descrição dos passos fundamentais do algoritmo (pontos 1-5)
+- Parágrafo 4: Característica de segurança criptográfica e prova matemática formal
+
+### Referência 2: Sidorenko, A., & Schoenmakers, B. (2005)
+- Parágrafo 4: Análise da segurança baseada no problema de resíduo quadrático
+- Parágrafo 5: Característica de segurança criptográfica sob a suposição do problema de fatoração
+
+### Referência 3: Vassilev, A., & Staples, R. (2016)
+- Parágrafo 5: Características sobre a eficiência computacional (lentidão relativa)
+- Parágrafo 6: Discussão sobre aplicações práticas em segurança
+
+### Referência 4: Koblitz, N. & Menezes, A. (2015)
+- Parágrafo 4: Relação com problemas computacionais intratáveis
+- Parágrafo 6: Limitações práticas em aplicações de alta performance
+
+### Referência 5: Menezes, A. J., Vanstone, S. A., & Oorschot, P. C. V. (1996)
+- Parágrafo 2: Base matemática em resíduos quadráticos
+- Parágrafo 5: Características técnicas sobre operações aritméticas de precisão arbitrária
+- Parágrafo 5: Informações sobre o período do gerador

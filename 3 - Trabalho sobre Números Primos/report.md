@@ -1,4 +1,3 @@
-
 # Introdução
 
 O que sera feito nesse trabalho?
@@ -88,9 +87,48 @@ Na prática, o algoritmo Xorshift oferece um excelente equilíbrio entre velocid
 
 ### Descrição
 
+O algoritmo Blum Blum Shub (BBS) é um gerador de números pseudoaleatórios criptograficamente seguro proposto em 1986 por Lenore Blum, Manuel Blum e Michael Shub. Diferentemente de algoritmos como o Xorshift, o BBS foi projetado com foco primário em segurança criptográfica, sendo fundamentado em problemas matemáticos considerados computacionalmente difíceis.
+
+A base matemática do BBS está na teoria dos resíduos quadráticos e na dificuldade do problema de fatoração de inteiros. O algoritmo funciona da seguinte forma:
+
+1. Escolhem-se dois números primos grandes p e q, cada um congruente a 3 módulo 4 (ou seja, p ≡ q ≡ 3 (mod 4))
+2. Calcula-se n = p × q, que é chamado de módulo de Blum
+3. Seleciona-se um valor inicial (semente) s, tal que s seja co-primo com n (ou seja, mdc(s,n) = 1)
+4. Gera-se a sequência de estados internos através da recorrência: x₁ = s² mod n, x₂ = x₁² mod n, x₃ = x₂² mod n, ...
+5. Para cada estado xᵢ, extrai-se um ou mais bits de saída, tipicamente o bit menos significativo de cada xᵢ
+
+A segurança do BBS deriva da dificuldade computacional de calcular raízes quadradas modulares sem conhecer os fatores de n. Sem o conhecimento de p e q, prever os próximos números na sequência é equivalente a resolver o problema de resíduo quadrático, que é considerado computacionalmente intratável para valores suficientemente grandes de n.
+
+Principais características do BBS:
+- É criptograficamente seguro sob a suposição de que o problema da fatoração de inteiros é difícil
+- Possui uma prova matemática formal de segurança
+- É significativamente mais lento que PRNGs não criptográficos como Xorshift
+- Requer operações aritméticas de precisão arbitrária para módulos grandes
+- Possui período potencialmente muito longo, dependendo da escolha de p, q e s
+
+O BBS é principalmente utilizado em aplicações criptográficas onde a previsibilidade representa um risco de segurança, embora sua lentidão relativa o torne menos adequado para aplicações que demandam alta performance ou grandes volumes de números aleatórios.
+
 ### Implementação
 
 ### Experimento
+
+Tempo médio para geração de números pseudoaleatórios de diferentes tamanhos usando o algoritmo Blum Blum Shub.
+
+| Algoritmo      | Tamanho do Número   | Tempo para gerar (ms)   |
+|----------------|---------------------|-------------------------|
+| Blum Blum Shub | 40 bits             | 0.1566 ms               |
+| Blum Blum Shub | 56 bits             | 0.2212 ms               |
+| Blum Blum Shub | 80 bits             | 0.3244 ms               |
+| Blum Blum Shub | 128 bits            | 0.5477 ms               |
+| Blum Blum Shub | 168 bits            | 0.6986 ms               |
+| Blum Blum Shub | 224 bits            | 0.9175 ms               |
+| Blum Blum Shub | 256 bits            | 1.0078 ms               |
+| Blum Blum Shub | 512 bits            | 2.0929 ms               |
+| Blum Blum Shub | 1024 bits           | 4.1772 ms               |
+| Blum Blum Shub | 2048 bits           | 8.6273 ms               |
+| Blum Blum Shub | 4096 bits           | 17.3932 ms              |
+
+*Cada medição representa a média de 10 execuções.*
 
 # Numeros primos
 
@@ -114,6 +152,8 @@ Na prática, o algoritmo Xorshift oferece um excelente equilíbrio entre velocid
 
 # Referências
 
+## Xorshift
+
 1. Marsaglia, G. (2003). "Xorshift RNGs". *Journal of Statistical Software*, 8(14), 1-6. https://doi.org/10.18637/jss.v008.i14
 
 2. Brent, R. P. (2004). "Note on Marsaglia's Xorshift Random Number Generators". *Journal of Statistical Software*, 11(5). https://doi.org/10.18637/jss.v011.i05
@@ -123,6 +163,18 @@ Na prática, o algoritmo Xorshift oferece um excelente equilíbrio entre velocid
 4. Vigna, S. (2016). "An experimental exploration of Marsaglia's xorshift generators, scrambled". *ACM Transactions on Mathematical Software*, 42(4), 30. https://doi.org/10.1145/2845077
 
 5. Blackman, D., & Vigna, S. (2018). "Scrambled Linear Pseudorandom Number Generators". *arXiv preprint* arXiv:1805.01407.
+
+## Blum Blum Shub
+
+1. Blum, L., Blum, M., & Shub, M. (1986). "A Simple Unpredictable Pseudo-Random Number Generator". *SIAM Journal on Computing*, 15(2), 364–383. https://doi.org/10.1137/0215025
+
+2. Sidorenko, A., & Schoenmakers, B. (2005). "Concrete Security of the Blum-Blum-Shub Pseudorandom Generator". *Cryptography and Coding*, 355-375.
+
+3. Vassilev, A., & Staples, R. (2016). "Entropy as a Service: Unlocking Cryptography's Full Potential". *Computer*, 49(9), 98-102. https://doi.org/10.1109/MC.2016.275
+
+4. Koblitz, N. & Menezes, A. (2015). "A riddle wrapped in an enigma". *IEEE Security & Privacy*, 13(6), 34-42. https://doi.org/10.1109/MSP.2015.132
+
+5. Menezes, A. J., Vanstone, S. A., & Oorschot, P. C. V. (1996). "Handbook of Applied Cryptography". CRC Press. (Chapter 5: Pseudorandom Bits and Sequences)
 
 
 # Anexos
