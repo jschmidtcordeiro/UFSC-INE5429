@@ -234,13 +234,6 @@ def generate_report(results: Dict) -> None:
     if failed_bits:
         report += f"- Não foi possível gerar números primos para os seguintes tamanhos: {', '.join(str(b) for b in failed_bits)} bits\n"
     
-    report += "- O tempo de processamento aumenta exponencialmente com o tamanho do número.\n"
-    report += "- Para números muito grandes (2048+ bits), o teste de primalidade se torna extremamente demorado.\n"
-    report += "- A probabilidade de encontrar um primo aleatoriamente diminui com o aumento do tamanho, seguindo aproximadamente 1/ln(n).\n"
-    report += "- O algoritmo de Miller-Rabin oferece maior confiabilidade que o teste de Fermat, eliminando problemas com números de Carmichael.\n"
-    report += "- Para tamanhos maiores (especialmente acima de 1024 bits), o tempo de execução se torna proibitivo em hardware comum.\n"
-    report += "- A implementação usa conjuntos de bases determinísticas para números até 2^64, tornando o teste determinístico e confiável para estes tamanhos.\n"
-    
     # Salva o relatório
     filename = "miller_rabin_report.md"
     with open(filename, "w") as f:
