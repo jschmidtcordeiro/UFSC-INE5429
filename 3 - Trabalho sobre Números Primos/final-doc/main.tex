@@ -1,0 +1,190 @@
+%https://github.com/SublimeText/LaTeXTools/issues/1439
+%!TEX output_directory=build
+
+% Allows you to write your thesis both in English and Portuguese
+% https://tex.stackexchange.com/questions/5076/is-it-possible-to-keep-my-translation-together-with-original-text
+\newif\ifenglish\englishfalse
+\newif\ifadvisor\advisorfalse
+
+% Uncomment the line `\englishtrue` to set the document default language to English
+% \englishtrue
+\advisortrue
+
+% https://tex.stackexchange.com/questions/131002/how-to-expand-ifthenelse-so-that-it-can-be-used-in-parshape
+\newcommand{\lang}[2]{\ifenglish#1\else#2\fi}
+\newcommand{\advisor}[2]{\ifadvisor#1\else#2\fi}
+
+% https://tex.stackexchange.com/questions/385895/how-to-make-passoptionstopackage-add-the-option-as-the-last
+% https://tex.stackexchange.com/questions/484400/changing-the-cleveref-package-language-conjunction-definition
+% https://tex.stackexchange.com/questions/516058/why-isnt-my-biblatex-language-changing-when-passing-the-language-on-my-document
+\ifenglish
+    \PassOptionsToPackage{brazil,main=english,spanish,french}{babel}
+\else
+    \PassOptionsToPackage{main=brazil,english,spanish,french}{babel}
+\fi
+
+% Simple alias for English and Portuguese words
+% https://tex.stackexchange.com/questions/513019/argument-of-bbltempd-has-an-extra
+\newcommand{\brazilword}[1]{\protect\foreignlanguage{brazil}{#1}}
+\newcommand{\englishword}[1]{\protect\foreignlanguage{english}{#1}}
+
+% Allow you to write `Evandro's house` in latex as `Evandro\s house` instead of `Evandro\textquotesingle{}s house`
+% https://tex.stackexchange.com/questions/31091/space-after-latex-commands
+\newcommand{\s}[0]{\textquotesingle{}s\xspace}
+\newcommand{\q}[0]{\textquotesingle{}\xspace}
+
+% Uncomment the following line if you want to use other biblatex settings
+% \PassOptionsToPackage{style=numeric,repeatfields=true,backend=biber,backref=true,citecounter=true}{biblatex}
+\documentclass[
+\lang{english}{brazilian,brazil}, % https://tex.stackexchange.com/questions/484400/changing-the-cleveref-package-language-conjunction-definition
+12pt, % Padrão UFSC para versão final
+a4paper, % Padrão UFSC para versão final
+oneside, % Impressão nos dois lados da folha
+chapter=TITLE, % Título de capítulos em caixa alta
+section=TITLE, % Título de seções em caixa alta
+]{setup/ufscthesisx}
+
+% Utilize o arquivo aftertext/references.bib para incluir sua bibliografia.
+% http://tug.ctan.org/tex-archive/macros/latex/contrib/cleveref/cleveref.pdf
+\addbibresource{aftertext/references.bib}
+
+% https://www.overleaf.com/learn/latex/Inserting_Images
+\graphicspath{{pictures/}}
+
+% ======================= DADOS DO AUTOR E DO TRABALHO =======================
+% Preencha com seus dados
+\autor{\brazilword{João Pedro Schmidt Cordeiro}}
+\titulo{\lang{Generation of Pseudo-Random Numbers and Primality Tests}{Geração de Números Pseudo-Aleatórios e Testes de Primalidade}}
+
+% Se houver subtítulo, descomente a linha abaixo
+% \subtitulo{\lang{Subtitle}{Subtítulo}}
+
+% Siglas para grau de formação Dr./Dra., Me./Ma, Bel. Bela. (inglês: PhD., MSc., Bs.)
+\orientador[\lang{Supervisor}{Orientador(a)}]{\brazilword{Nome do Orientador(a)}, \lang{Phd.}{Dr.}}
+
+% Se houver coorientador, descomente a linha abaixo
+% \coorientador[\lang{Co-supervisor}{Coorientador(a)}]{\brazilword{Nome do coorientador(a)}, \lang{Phd.}{Dr.}}
+
+% Preencher com o nome do Coordenador de TCCs/Teses do seu curso
+\coordenador[\lang{Coordinator}{Coordenador(a)}]{\brazilword{Nome do Coordenador(a)}, \lang{Phd.}{Dr.}}
+
+% Local da sua defesa
+\local{\brazilword{Florianópolis, Santa Catarina} -- \lang{Brazil}{Brasil}}
+
+% Ano da sua defesa
+\ano{2025}
+\biblioteca{\lang{University Library}{Biblioteca Universitária}}
+
+% Sigla da sua instituição
+\instituicaosigla{UFSC}
+\instituicao{\brazilword{Universidade Federal de Santa Catarina}}
+
+% Preencha com Tese, Dissertação, Monografia ou Trabalho de Conclusão de Curso, Bachelor's Thesis, etc
+\tipotrabalho{\lang{Bachelor\s Thesis}{Trabalho de Conclusão de Curso}}
+
+% Se houver Área de Concentração, descomente a linha abaixo
+% \area{\lang{Information Security}{Segurança da Informação}}
+
+% Preencha com Doutor, Bacharel ou Mestrando
+\formacao{\lang
+    {Bachelor of Science degree in Computer Science}
+    {Bacharel em Ciências da Computação}%
+}
+\programa{\lang
+    {Undergraduate Program in Computer Science}
+    {Programa de Graduação em Ciências da Computação}%
+}
+
+% Preencha com Departamento de XXXXXX, Centro de XXXXXX
+\centro{\lang
+    {INE -- Department of Informatics and Statistics, CTC -- Technological Center}
+    {INE -- Departamento de Informática e Estatística, CTC -- Centro Tecnológico}%
+}
+
+% Preencha com Campus XXXXXX     ou     Centro de XXXXXX
+\campus{\brazilword{Campus Reitor João David Ferreira Lima}}
+
+% Data da sua defesa
+\data{\lang{30 of march of}{30 de março de} 2025}
+
+% O preambulo deve conter tipo do trabalho, objetivo, nome da instituição e a área de concentração.
+\preambulo{\lang%
+    {%
+        \imprimirtipotrabalho~submitted to the \imprimirprograma~of
+        \imprimirinstituicao~for degree acquirement in \imprimirformacao.%
+    }{%
+        \imprimirtipotrabalho~submetido ao \imprimirprograma~da
+        \imprimirinstituicao~para a obtenção do Grau de \imprimirformacao.%
+    }%
+}
+
+% Allows you to use ~= instead of `\hyp{}`
+% https://tex.stackexchange.com/questions/488008/how-to-create-an-alternative-to-shortcut-or-hyp
+% https://tex.stackexchange.com/questions/405718/depending-on-babel-language-setting-i-get-biblatex-error-argument-of-language
+% https://tex.stackexchange.com/questions/340661/argument-of-languageactivearg-has-an-extra-i-use-includegraphics-and-r
+\useshorthands{~}\defineshorthand{~=}{\hyp{}}
+
+% ======================= PALAVRAS-CHAVE =======================
+% Adicione suas palavras-chave para o documento
+\palavraschaveufsc{palavraschaveingles}   {Information Security}
+\palavraschaveufsc{palavraschaveportugues}{Segurança da Informação}
+
+\palavraschaveufsc{palavraschaveingles}   {Cryptography}
+\palavraschaveufsc{palavraschaveportugues}{Criptografia}
+
+\palavraschaveufsc{palavraschaveingles}   {Ethics}
+\palavraschaveufsc{palavraschaveportugues}{Ética}
+
+\hypersetup
+{
+    pdfsubject={Document Abstract},
+    pdfcreator={LaTeX with abnTeX2 for UFSC},
+    pdftitle={\imprimirtitulo},
+    pdfauthor={\imprimirautor},
+    pdfkeywords={\lang{\palavraschaveinglessemitem}{\palavraschaveportuguessemitem}},
+}
+
+% Altere o arquivo 'settings.tex' para incluir customizações de aparência da sua tese
+\input{settings.tex}
+
+\begin{document}
+    % FIXME: Comment this after finishing the thesis, so you can start fixing the \flushbottom vs \raggedbottom
+    % https://tex.stackexchange.com/questions/65355/flushbottom-vs-raggedbottom
+    \raggedbottom
+
+    % https://tex.stackexchange.com/questions/4705/double-space-between-sentences
+    \frenchspacing
+
+    % Uncomment this to put a ←← | ← (Go To Top/Go Back) on each section header
+    \advisor{}{\addGoToSummary}
+
+    % ELEMENTOS PRÉ-TEXTUAIS
+    % Capa
+    \pretextual
+    % https://tex.stackexchange.com/questions/227711/blank-page-after-titlingpage
+    \advisor{}{\AtBeginShipoutNext{\AtBeginShipoutNext{\AtBeginShipoutDiscard}}}
+    \imprimircapa
+
+    % ======================= CONTEÚDO DO DOCUMENTO =======================
+    \textual
+    
+    % Incluindo os capítulos do trabalho
+    \input{chapters/00-introducao.tex}
+    
+    \input{chapters/01-numeros-aleatorios.tex}
+    
+    \input{chapters/02-numeros-primos.tex}
+    
+    \input{chapters/03-conclusao.tex}
+
+    % ELEMENTOS PÓS-TEXTUAIS
+    \postextual
+    
+    % Apêndices
+    % \input{appendix/00-introducao-apendices.tex}
+    \input{appendix/05-code-repository.tex}
+    
+    % Referências bibliográficas
+    \printbibliography[title=\lang{REFERENCES}{REFERÊNCIAS}]
+
+\end{document}

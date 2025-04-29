@@ -1,0 +1,302 @@
+\chapter{Números Primos}\label{chap:numeros-primos}
+
+\section{Teste de Primalidade de Fermat}
+
+\subsection{Descrição}
+
+O Teste de Primalidade de Fermat é um método probabilístico para determinar se um número é provavelmente primo. Baseado no Pequeno Teorema de Fermat, este teste foi desenvolvido no século XVII e é um dos testes de primalidade mais antigos e fundamentais \cite{cohen1993course}.
+
+O Pequeno Teorema de Fermat, que é a base matemática do teste, estabelece que:
+
+Se $p$ é um número primo e $a$ é um inteiro não divisível por $p$, então:
+
+\begin{equation}
+a^{p-1} \equiv 1 \pmod{p}
+\end{equation}
+
+Ou seja, quando elevamos qualquer número $a$ à potência $p-1$ e dividimos o resultado por $p$, o resto será sempre 1, desde que $a$ e $p$ sejam coprimos (não compartilhem fatores comuns além de 1).
+
+O teste funciona da seguinte forma \cite{cohen1993course}:
+
+\begin{enumerate}
+    \item Para verificar se um número $n$ é primo, escolhemos aleatoriamente um valor de $a$ tal que $1 < a < n-1$.
+    \item Calculamos $a^{n-1} \bmod n$.
+    \item Se o resultado não for 1, então $n$ é definitivamente composto (não primo).
+    \item Se o resultado for 1, então $n$ é provavelmente primo, e $a$ é chamado de ``testemunha de Fermat'' para a provável primalidade de $n$.
+\end{enumerate}
+
+Para aumentar a confiança no resultado, o teste pode ser repetido com diferentes valores de $a$. Cada teste bem-sucedido aumenta a probabilidade de que $n$ seja realmente primo, embora nunca forneça uma prova definitiva de primalidade.
+
+Uma característica importante deste teste é que ele nunca produz falsos negativos - se o teste indica que um número é composto, então ele é definitivamente composto. No entanto, existem números compostos especiais, chamados ``pseudoprimos de Fermat'' \cite{pomerance1980pseudoprimes, ribenboim1995new}, que podem enganar o teste para bases específicas. Ainda mais problemáticos são os números de Carmichael, que são números compostos que passam no teste de Fermat para todas as bases $a$ que são coprimas com $n$ \cite{alford1994infinitely, pinch1993carmichael}.
+
+Apesar desta limitação, o Teste de Fermat é valorizado por sua simplicidade e eficiência computacional, especialmente para verificações iniciais rápidas \cite{ribenboim1995new}. Ele frequentemente é usado como um pré-teste antes de aplicar métodos mais robustos como Miller-Rabin ou outros testes determinísticos mais complexos.
+
+O algoritmo do teste pode ser descrito da seguinte forma \cite{cohen1993course}:
+
+\textbf{Entradas}: $n$ (número a ser testado), $k$ (número de iterações do teste)\\
+\textbf{Saída}: ``composto'' ou ``provavelmente primo''
+
+\begin{enumerate}
+    \item Repita $k$ vezes:
+    \begin{enumerate}
+        \item Escolha um número aleatório $a$ no intervalo $[2, n-2]$
+        \item Se $\gcd(a, n) \neq 1$, retorne ``composto''
+        \item Se $a^{n-1} \bmod n \neq 1$, retorne ``composto''
+    \end{enumerate}
+    \item Se após $k$ iterações nenhum valor de $a$ demonstrou que $n$ é composto, retorne ``provavelmente primo''
+\end{enumerate}
+
+A complexidade computacional do teste é $O(k \log^2 n \log \log n)$, onde $k$ é o número de testes realizados e $n$ é o valor a ser verificado \cite{cormen2009introduction}. Esta eficiência torna o teste de Fermat particularmente útil para números muito grandes, apesar de suas limitações inerentes \cite{cormen2009introduction}.
+
+\subsection{Implementação}
+
+A implementação do Teste de Primalidade de Fermat realizada neste trabalho segue fielmente o algoritmo descrito na seção anterior. Utilizamos a linguagem Python devido à sua facilidade de manipulação de números grandes, essencial para testes de primalidade eficientes.
+
+Nossa implementação inclui recursos para geração de números aleatórios através do algoritmo Xorshift (discutido no Capítulo \ref{chap:numeros-aleatorios}), exponenciação modular rápida e verificação de coprimalidade.
+
+O código completo do Teste de Primalidade de Fermat será apresentado no Apêndice \ref{apx:fermat-impl}, juntamente com a implementação dos testes experimentais. A implementação foi projetada para máxima clareza e eficiência, permitindo a verificação de números de até 4096 bits.
+
+\subsection{Experimento}
+
+\subsubsection{Experimento 1 - Tentativas limitadas por tentativas}
+
+\textbf{Data/Hora}: 2025-04-25 09:52:30
+
+\paragraph{Resultados}
+
+\begin{table}[H]
+\centering
+\caption{Resultados do Teste de Primalidade de Fermat (Experimento 1)}
+\label{tab:fermat-exp1}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Algoritmo} & \textbf{Tamanho do Número} & \textbf{Tentativas} & \textbf{Tempo para gerar} \\
+\hline
+Fermat Primality Test & 40 bits & 4 & 0,56 ms \\
+Fermat Primality Test & 56 bits & 1 & 0,17 ms \\
+Fermat Primality Test & 80 bits & 8 & 0,43 ms \\
+Fermat Primality Test & 128 bits & 57 & 2,81 ms \\
+Fermat Primality Test & 168 bits & 13 & 1,96 ms \\
+Fermat Primality Test & 224 bits & 10 & 4,48 ms \\
+Fermat Primality Test & 256 bits & 154 & 31,63 ms \\
+Fermat Primality Test & 512 bits & 23 & 40,07 ms \\
+Fermat Primality Test & 1024 bits & 374 & 2206,93 ms \\
+Fermat Primality Test & 2048 bits & 100 & 3741,89 ms (falha) \\
+Fermat Primality Test & 4096 bits & 100 & 29044,89 ms (falha) \\
+\hline
+\end{tabular}
+\end{table}
+
+\paragraph{Observações}
+\begin{itemize}
+    \item Taxa de sucesso: 9/11 (81,8\%)
+    \item Tempo médio: 254,34 ms
+    \item Tempo mínimo: 0,17 ms
+    \item Tempo máximo: 2206,93 ms
+    \item Tentativas médias: 71,56
+    \item Tentativas mínimas: 1
+    \item Tentativas máximas: 374
+\end{itemize}
+
+\paragraph{Relação entre tamanho e esforço}
+\begin{itemize}
+    \item À medida que o tamanho em bits aumenta, nota-se:
+    \begin{itemize}
+        \item Para 40 bits: 4 tentativas, 0,56 ms
+        \item Para 1024 bits: 374 tentativas, 2206,93 ms
+        \item Aumento de tentativas: 93,50x
+        \item Aumento de tempo: 3940,95x
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Experimento 2 - Tentativas limitadas por tempo}
+
+\textbf{Data/Hora}: 2025-04-25 11:28:49
+
+\paragraph{Resultados}
+
+\begin{table}[H]
+\centering
+\caption{Resultados do Teste de Primalidade de Fermat (Experimento 2)}
+\label{tab:fermat-exp2}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Algoritmo} & \textbf{Tamanho do Número} & \textbf{Tentativas} & \textbf{Tempo para gerar} \\
+\hline
+Fermat Primality Test & 40 bits & 3 & 0,83 ms \\
+Fermat Primality Test & 56 bits & 46 & 0,74 ms \\
+Fermat Primality Test & 80 bits & 37 & 0,92 ms \\
+Fermat Primality Test & 128 bits & 5 & 0,73 ms \\
+Fermat Primality Test & 168 bits & 57 & 8,89 ms \\
+Fermat Primality Test & 224 bits & 63 & 10,11 ms \\
+Fermat Primality Test & 256 bits & 35 & 11,42 ms \\
+Fermat Primality Test & 512 bits & 145 & 166,37 ms \\
+Fermat Primality Test & 1024 bits & 128 & 792,42 ms \\
+Fermat Primality Test & 2048 bits & 145 & 5343,09 ms \\
+Fermat Primality Test & 4096 bits & 768 & 211568,14 ms \\
+\hline
+\end{tabular}
+\end{table}
+
+\paragraph{Observações}
+\begin{itemize}
+    \item Taxa de sucesso: 11/11 (100,0\%)
+    \item Tempo médio: 19809,42 ms
+    \item Tempo mínimo: 0,73 ms
+    \item Tempo máximo: 211568,14 ms
+    \item Tentativas médias: 130,18
+    \item Tentativas mínimas: 3
+    \item Tentativas máximas: 768
+\end{itemize}
+
+\paragraph{Relação entre tamanho e esforço}
+\begin{itemize}
+    \item À medida que o tamanho em bits aumenta, nota-se:
+    \begin{itemize}
+        \item Para 40 bits: 3 tentativas, 0,83 ms
+        \item Para 4096 bits: 768 tentativas, 211568,14 ms
+        \item Aumento de tentativas: 256,00x
+        \item Aumento de tempo: 254901,37x
+    \end{itemize}
+\end{itemize}
+
+\section{Teste de Primalidade de Miller-Rabin}
+
+\subsection{Descrição}
+
+O Teste de Primalidade de Miller-Rabin é um algoritmo probabilístico amplamente utilizado para determinar se um número é provavelmente primo. Desenvolvido por Gary Miller \cite{miller1976riemann} e Michael Rabin \cite{rabin1980probabilistic} na década de 1970, este teste é uma evolução do Teste de Fermat, oferecendo maior confiabilidade e menor probabilidade de falsos positivos.
+
+A base matemática do teste Miller-Rabin está na teoria dos números e em propriedades específicas de números primos \cite{miller1976riemann, shoup2009computational}. Especificamente, o teste explora o fato de que, para números primos $p$, a equação $x^2 \equiv 1 \pmod{p}$ tem exatamente duas soluções: $x \equiv 1 \pmod{p}$ e $x \equiv -1 \pmod{p}$. Para números compostos, podem existir outras soluções, conhecidas como ``raízes quadradas não-triviais de 1''.
+
+O algoritmo funciona da seguinte forma \cite{miller1976riemann}:
+
+\begin{enumerate}
+    \item Para um número ímpar $n > 3$ a ser testado, expressamos $n-1$ como $2^s \cdot d$, onde $d$ é ímpar.
+    \item Escolhemos uma base $a$ aleatória tal que $2 \leq a \leq n-2$.
+    \item Calculamos $x_0 = a^d \bmod n$.
+    \item Se $x_0 = 1$ ou $x_0 = n-1$, então $a$ é uma testemunha da provável primalidade de $n$.
+    \item Caso contrário, calculamos a sequência $x_1 = x_0^2 \bmod n$, $x_2 = x_1^2 \bmod n$, \ldots, $x_{s-1} = x_{s-2}^2 \bmod n$.
+    \item Se em algum momento encontrarmos $x_i = n-1$, então $a$ é uma testemunha da provável primalidade.
+    \item Se chegarmos ao fim da sequência sem encontrar $n-1$, então $a$ é uma testemunha da composição de $n$, provando definitivamente que $n$ é composto.
+\end{enumerate}
+
+O teste é repetido $k$ vezes com diferentes bases $a$ aleatórias. Se todas as bases testadas forem testemunhas da provável primalidade, declaramos $n$ como ``provavelmente primo''. A probabilidade de um número composto ser incorretamente classificado como primo é no máximo $4^{-k}$ \cite{rabin1980probabilistic, yan2009primality}, o que significa que cada iteração adicional reduz a probabilidade de erro por um fator de 4.
+
+Uma característica fundamental do Miller-Rabin é que, diferentemente do Teste de Fermat, não existem números compostos que passem no teste para todas as bases possíveis. Para um número composto $n$, pelo menos 3/4 de todas as possíveis bases $2 \leq a \leq n-2$ revelarão que $n$ é composto \cite{crandall2005prime, yan2009primality}. Esta propriedade elimina o problema dos números de Carmichael que afeta o teste de Fermat.
+
+Além disso, existem versões determinísticas do teste Miller-Rabin para números de até um certo tamanho, usando um conjunto específico e limitado de bases \cite{crandall2005prime, menezes1996handbook_miller}. Por exemplo, para números de 64 bits, testar apenas as bases $\{2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37\}$ é suficiente para determinar com certeza absoluta se o número é primo.
+
+A complexidade computacional do teste Miller-Rabin é $O(k \log^3 n)$, onde $k$ é o número de iterações e $n$ é o número sendo testado \cite{crandall2005prime}. Esta eficiência, combinada com sua forte garantia probabilística, torna o Miller-Rabin o teste de primalidade mais utilizado em aplicações criptográficas modernas, incluindo geração de chaves para RSA, DSA e outros sistemas criptográficos \cite{rabin1980probabilistic, menezes1996handbook_miller}.
+
+O pseudocódigo do algoritmo pode ser descrito como \cite{shoup2009computational}:
+
+\begin{verbatim}
+Função Miller-Rabin(n, k):
+    Se n = 2 ou n = 3, retorne "primo"
+    Se n <= 1 ou n é par, retorne "composto"
+    
+    Escreva n-1 como 2^s * d, onde d é ímpar
+    
+    Para i de 1 até k:
+        a ← número aleatório entre 2 e n-2
+        x ← a^d mod n
+        
+        Se x = 1 ou x = n-1, continue com próxima iteração
+        
+        Para r de 1 até s-1:
+            x ← x² mod n
+            Se x = n-1, continue com próxima iteração de i
+            Se x = 1, retorne "composto"
+        
+        Retorne "composto"
+    
+    Retorne "provavelmente primo"
+\end{verbatim}
+
+A principal vantagem do Miller-Rabin sobre outros testes de primalidade é seu equilíbrio entre eficiência computacional e confiabilidade estatística \cite{shoup2009computational, yan2009primality}, tornando-o ideal para sistemas criptográficos que dependem da geração rápida de números primos grandes \cite{menezes1996handbook_miller}.
+
+\subsection{Implementação}
+
+Nossa implementação do Teste de Primalidade de Miller-Rabin segue estritamente o algoritmo descrito na seção anterior. O código foi desenvolvido em Python, beneficiando-se de suas facilidades para manipulação de inteiros grandes.
+
+A implementação inclui otimizações para a exponenciação modular rápida e decomposição eficiente de $n-1$ como $2^s \cdot d$. Para a geração de bases aleatórias, utilizamos o algoritmo Xorshift apresentado no Capítulo \ref{chap:numeros-aleatorios}, garantindo uma boa distribuição estatística das bases testadas.
+
+O código completo do Teste de Primalidade de Miller-Rabin será apresentado no Apêndice \ref{apx:miller-rabin-impl}, junto com os scripts de teste utilizados nos experimentos. Implementamos também uma versão determinística para números de até 64 bits, utilizando um conjunto fixo de bases que garante resultado exato nessa faixa.
+
+\subsection{Experimento}
+
+\textbf{Data/Hora}: 2025-04-25 10:47:04
+
+\paragraph{Resultados}
+
+\begin{table}[H]
+\centering
+\caption{Resultados do Teste de Primalidade de Miller-Rabin}
+\label{tab:miller-rabin}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Algoritmo} & \textbf{Tamanho do Número} & \textbf{Tentativas} & \textbf{Tempo para gerar} \\
+\hline
+Miller-Rabin & 40 bits & 1 & 0,03 ms \\
+Miller-Rabin & 56 bits & 70 & 0,56 ms \\
+Miller-Rabin & 80 bits & 4 & 0,56 ms \\
+Miller-Rabin & 128 bits & 15 & 1,67 ms \\
+Miller-Rabin & 168 bits & 129 & 8,60 ms \\
+Miller-Rabin & 224 bits & 150 & 19,00 ms \\
+Miller-Rabin & 256 bits & 46 & 11,76 ms \\
+Miller-Rabin & 512 bits & 128 & 158,37 ms \\
+Miller-Rabin & 1024 bits & 844 & 4530,48 ms \\
+Miller-Rabin & 2048 bits & 297 & 11650,23 ms \\
+Miller-Rabin & 4096 bits & 2356 & 633614,98 ms \\
+\hline
+\end{tabular}
+\end{table}
+
+\paragraph{Observações}
+\begin{itemize}
+    \item Taxa de sucesso: 11/11 (100,0\%)
+    \item Tempo médio: 59090,57 ms
+    \item Tempo mínimo: 0,03 ms
+    \item Tempo máximo: 633614,98 ms
+    \item Tentativas médias: 367,27
+    \item Tentativas mínimas: 1
+    \item Tentativas máximas: 2356
+\end{itemize}
+
+\paragraph{Relação entre tamanho e esforço}
+\begin{itemize}
+    \item À medida que o tamanho em bits aumenta, nota-se:
+    \begin{itemize}
+        \item Para 40 bits: 1 tentativa, 0,03 ms
+        \item Para 4096 bits: 2356 tentativas, 633614,98 ms
+        \item Aumento de tentativas: 2356,00x
+        \item Aumento de tempo: 19981758,38x
+    \end{itemize}
+\end{itemize}
+
+\section{Análise}
+
+Ao comparar o Teste de Primalidade de Fermat e o Teste de Miller-Rabin, podemos observar características importantes em termos de eficiência, precisão e aplicabilidade prática.
+
+Foi decidido implementar o teste de Fermat como complemento ao Miller-Rabin devido à relação evolutiva entre eles. O teste de Fermat constitui a base histórica e conceitual para o teste de Miller-Rabin, permitindo uma análise comparativa que evidencia por que o segundo tornou-se o padrão em aplicações criptográficas modernas.
+
+A diferença fundamental entre os dois algoritmos está na forma como lidam com casos especiais. O teste de Fermat sofre de uma limitação crítica: os números de Carmichael (como 561, 1105, 1729) \cite{alford1994infinitely, pinch1993carmichael}, que são números compostos que passam no teste para todas as bases coprimas, resultando em falsos positivos. Este problema impossibilita seu uso isolado em aplicações de segurança.
+
+Miller-Rabin, por outro lado, refina o teste ao adicionar verificações para raízes quadradas não-triviais de 1, eliminando o problema dos números de Carmichael \cite{yan2009primality}. Para qualquer número composto $n$, pelo menos 3/4 de todas as possíveis bases revelarão sua composição \cite{crandall2005prime}, garantindo uma probabilidade de erro que decresce exponencialmente com o número de iterações ($4^{-k}$) \cite{rabin1980probabilistic}.
+
+Analisando os experimentos realizados, observamos padrões importantes. Ambos os algoritmos apresentam aumento significativo no tempo de execução conforme o tamanho do número cresce. Para números de 4096 bits, o Miller-Rabin apresentou um aumento de aproximadamente 20 milhões de vezes no tempo em relação a números de 40 bits, enquanto o Fermat apresentou um aumento de cerca de 255 mil vezes.
+
+Em termos de complexidade, o teste de Fermat tem complexidade $O(k \times \log^2 n \log \log n)$ \cite{cormen2009introduction}, onde $k$ é o número de iterações e $n$ o número testado. Já o Miller-Rabin apresenta complexidade $O(k \times \log^3 n)$ \cite{crandall2005prime}. A complexidade adicional do Miller-Rabin justifica-se pela verificação mais rigorosa que realiza, executando múltiplas verificações de quadrados modulares ao longo do processo.
+
+Quanto ao número de tentativas, o Miller-Rabin geralmente necessitou mais tentativas para encontrar números primos (média de 367,27 tentativas contra 130,18 do Fermat no segundo experimento). Para 4096 bits, Miller-Rabin necessitou 2356 tentativas contra 768 do Fermat.
+
+Um aspecto importante observado em ambos os algoritmos é a variabilidade do tempo de execução mesmo para números do mesmo tamanho. Isso ocorre porque o tempo depende não apenas do tamanho do número, mas também de suas propriedades matemáticas específicas. A natureza probabilística dos testes significa que alguns números são confirmados como primos mais rapidamente que outros. Além disso, a aleatoriedade na escolha das bases testemunhas influencia significativamente o desempenho. Esta variabilidade reforça a necessidade de múltiplas execuções para obter resultados estatisticamente significativos, como foi feito nos experimentos.
+
+Embora o teste de Fermat seja computacionalmente mais eficiente para números muito grandes (como demonstrado no tempo médio de 19809,42 ms contra 59090,57 ms do Miller-Rabin), sua suscetibilidade a falsos positivos o torna inadequado para aplicações criptográficas críticas, onde a certeza da primalidade é essencial.
+
+Miller-Rabin, apesar do maior custo computacional, oferece garantias probabilísticas muito mais robustas \cite{menezes1996handbook_miller}, tornando-o preferível para geração de chaves em criptografia assimétrica (RSA, DSA), sistemas de assinatura digital e protocolos que dependem da dificuldade da fatoração de números compostos \cite{rabin1980probabilistic}.
+
+Por fim, observamos que ambos os algoritmos conseguiram gerar com sucesso números primos de até 4096 bits, tamanho suficiente para aplicações criptográficas modernas, embora com tempos significativamente diferentes.
+
+Esta análise comparativa demonstra que, apesar da eficiência computacional do teste de Fermat, o teste de Miller-Rabin representa um avanço fundamental na verificação de primalidade \cite{menezes1996handbook_miller, yan2009primality}, equilibrando de forma mais adequada eficiência e confiabilidade para aplicações de segurança computacional \cite{shoup2009computational}.
+

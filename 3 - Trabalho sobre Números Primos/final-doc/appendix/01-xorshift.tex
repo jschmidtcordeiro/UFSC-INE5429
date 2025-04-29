@@ -1,0 +1,427 @@
+\section{Xorshift}\label{apx:xorshift-impl}
+
+\subsection{Implementação do Algoritmo}
+
+\begin{verbatim}
+"""
+Implementação do algoritmo Xorshift PRNG
+Baseado no trabalho original de George Marsaglia (2003)
+
+Inclui implementações para versões de 32 bits, 64 bits e 128 bits.
+"""
+
+class Xorshift32:
+    """
+    Implementação do Xorshift de 32 bits com período de 2^32-1.
+    """
+    def __init__(self, seed=123456789):
+        """
+        Inicializa o gerador com uma semente não-nula.
+        
+        Args:
+            seed (int): Valor de semente. Deve ser não-zero.
+        """
+        if seed == 0:
+            seed = 123456789  # Evita estado zero
+        self.state = seed & 0xFFFFFFFF  # Garante valor de 32 bits
+    
+    def next(self):
+        """
+        Gera o próximo número pseudoaleatório.
+        
+        Returns:
+            int: Um número pseudoaleatório de 32 bits.
+        """
+        # Copia o estado atual para a variável x
+        x = self.state
+        # Aplica o primeiro deslocamento: desloca x 13 bits à esquerda, 
+        # faz XOR com o valor original e mantém apenas os 32 bits inferiores
+        x ^= (x << 13) & 0xFFFFFFFF
+        # Aplica o segundo deslocamento: desloca x 17 bits à direita,
+        # faz XOR com o resultado anterior e mantém apenas os 32 bits inferiores
+        x ^= (x >> 17) & 0xFFFFFFFF
+        # Aplica o terceiro deslocamento: desloca x 5 bits à esquerda,
+        # faz XOR com o resultado anterior e mantém apenas os 32 bits inferiores
+        x ^= (x << 5) & 0xFFFFFFFF
+        # Atualiza o estado interno do gerador com o novo valor
+        # garantindo que apenas os 32 bits inferiores sejam mantidos
+        self.state = x & 0xFFFFFFFF
+        
+        # Retorna o novo estado como o número pseudoaleatório gerado
+        return self.state
+    
+    def random(self):
+        """
+        Retorna um número de ponto flutuante no intervalo [0.0, 1.0).
+        
+        Returns:
+            float: Um número entre 0.0 e 1.0.
+        """
+        return self.next() / 0x100000000
+
+
+class Xorshift64:
+    """
+    Implementação do Xorshift de 64 bits com período de 2^64-1.
+    """
+    def __init__(self, seed=88172645463325252):
+        """
+        Inicializa o gerador com uma semente não-nula.
+        
+        Args:
+            seed (int): Valor de semente. Deve ser não-zero.
+        """
+        if seed == 0:
+            seed = 88172645463325252  # Evita estado zero
+        self.state = seed & 0xFFFFFFFFFFFFFFFF  # Garante valor de 64 bits
+    
+    def next(self):
+        """
+        Gera o próximo número pseudoaleatório.
+        
+        Returns:
+            int: Um número pseudoaleatório de 64 bits.
+        """
+        # Copia o estado atual para a variável x
+        x = self.state
+        # Aplica XOR entre x e (x deslocado 13 bits à esquerda), mantendo apenas 64 bits
+        x ^= (x << 13) & 0xFFFFFFFFFFFFFFFF
+        # Aplica XOR entre x e (x deslocado 7 bits à direita), mantendo apenas 64 bits
+        x ^= (x >> 7) & 0xFFFFFFFFFFFFFFFF
+        # Aplica XOR entre x e (x deslocado 17 bits à esquerda), mantendo apenas 64 bits
+        x ^= (x << 17) & 0xFFFFFFFFFFFFFFFF
+        # Atualiza o estado interno com o novo valor, garantindo que tenha apenas 64 bits
+        self.state = x & 0xFFFFFFFFFFFFFFFF
+        # Retorna o novo estado como o número pseudoaleatório gerado
+        return self.state
+    
+    def random(self):
+        """
+        Retorna um número de ponto flutuante no intervalo [0.0, 1.0).
+        
+        Returns:
+            float: Um número entre 0.0 e 1.0.
+        """
+        return self.next() / 0x10000000000000000
+
+
+class Xorshift128:
+    """
+    Implementação do Xorshift de 128 bits com período de 2^128-1.
+    """
+    def __init__(self, seed=None):
+        """
+        Inicializa o gerador com uma semente ou valores padrão.
+        
+        Args:
+            seed (list, optional): Lista de 4 valores inteiros para inicializar o estado.
+        """
+        if seed is None:
+            # Valores iniciais não-nulos por padrão
+            self.state = [123456789, 362436069, 521288629, 88675123]
+        else:
+            # Verifica se todos os valores são zero
+            if all(s == 0 for s in seed):
+                self.state = [123456789, 362436069, 521288629, 88675123]
+            else:
+                self.state = [s & 0xFFFFFFFF for s in seed[:4]]
+    
+    def next(self):
+        """
+        Gera o próximo número pseudoaleatório.
+        
+        Returns:
+            int: Um número pseudoaleatório de 32 bits.
+        """
+        # Armazena o último valor do estado (índice 3) em t
+        t = self.state[3]
+        # Armazena o primeiro valor do estado (índice 0) em s
+        s = self.state[0]
+        
+        # Desloca os valores do estado: o valor do índice 2 vai para o índice 3
+        self.state[3] = self.state[2]
+        # Desloca os valores do estado: o valor do índice 1 vai para o índice 2
+        self.state[2] = self.state[1]
+        # Desloca os valores do estado: o valor do índice 0 (s) vai para o índice 1
+        self.state[1] = s
+        
+        # Aplica a primeira transformação XOR: desloca t 11 bits à esquerda e faz XOR com t
+        # A máscara 0xFFFFFFFF garante que o resultado tenha 32 bits
+        t ^= (t << 11) & 0xFFFFFFFF
+        # Aplica a segunda transformação XOR: desloca t 8 bits à direita e faz XOR com t
+        t ^= (t >> 8) & 0xFFFFFFFF
+        # Aplica a terceira transformação XOR: faz XOR entre t e o resultado de (s XOR (s deslocado 19 bits à direita))
+        t ^= (s ^ (s >> 19)) & 0xFFFFFFFF
+        
+        # Atualiza o primeiro valor do estado (índice 0) com o novo valor de t
+        # A máscara 0xFFFFFFFF garante que o resultado tenha 32 bits
+        self.state[0] = t & 0xFFFFFFFF
+        # Retorna o valor gerado, garantindo que tenha 32 bits
+        return t & 0xFFFFFFFF
+    
+    def random(self):
+        """
+        Retorna um número de ponto flutuante no intervalo [0.0, 1.0).
+        
+        Returns:
+            float: Um número entre 0.0 e 1.0.
+        """
+        return self.next() / 0x100000000
+
+
+class Xorshift128Plus:
+    """
+    Implementação do Xorshift128+ - uma variante que utiliza adição para
+    melhorar a qualidade estatística (período 2^128-1).
+    """
+    def __init__(self, seed=None):
+        """
+        Inicializa o gerador com uma semente ou valores padrão.
+        
+        Args:
+            seed (list, optional): Lista de 2 valores inteiros de 64 bits para inicializar o estado.
+        """
+        if seed is None:
+            # Valores iniciais não-nulos por padrão
+            self.state = [1234567890123456789, 9876543210987654321]
+        else:
+            # Verifica se todos os valores são zero
+            if all(s == 0 for s in seed):
+                self.state = [1234567890123456789, 9876543210987654321]
+            else:
+                self.state = [s & 0xFFFFFFFFFFFFFFFF for s in seed[:2]]
+    
+    def next(self):
+        """
+        Gera o próximo número pseudoaleatório.
+        
+        Returns:
+            int: Um número pseudoaleatório de 64 bits.
+        """
+        # Armazena os dois valores do estado atual em variáveis temporárias
+        s0 = self.state[0]  # Primeiro valor do estado (64 bits)
+        s1 = self.state[1]  # Segundo valor do estado (64 bits)
+        
+        # Atualiza o primeiro valor do estado com o valor de s1
+        # Isso faz parte da rotação do estado para a próxima iteração
+        self.state[0] = s1
+        
+        # Aplica a primeira transformação XOR em s1:
+        # Desloca s1 23 bits à esquerda, faz XOR com s1 original
+        # A máscara 0xFFFFFFFFFFFFFFFF garante que o resultado tenha 64 bits
+        s1 ^= (s1 << 23) & 0xFFFFFFFFFFFFFFFF
+        
+        # Calcula o novo valor para o segundo elemento do estado:
+        # Combina s1 transformado com s0 original e mais duas operações de deslocamento e XOR
+        # - s1 ^ s0: XOR entre s1 transformado e s0 original
+        # - ^ (s1 >> 18): XOR com s1 deslocado 18 bits à direita
+        # - ^ (s0 >> 5): XOR com s0 deslocado 5 bits à direita
+        # A máscara final garante que o resultado tenha 64 bits
+        self.state[1] = (s1 ^ s0 ^ (s1 >> 18) ^ (s0 >> 5)) & 0xFFFFFFFFFFFFFFFF
+        
+        # Retorna a soma dos dois valores do estado como o número pseudoaleatório
+        # Esta adição é o que diferencia o Xorshift128+ do Xorshift128 padrão,
+        # melhorando a qualidade estatística dos números gerados
+        # A máscara garante que o resultado tenha 64 bits
+        return (self.state[0] + self.state[1]) & 0xFFFFFFFFFFFFFFFF
+    
+    def random(self):
+        """
+        Retorna um número de ponto flutuante no intervalo [0.0, 1.0).
+        
+        Returns:
+            float: Um número entre 0.0 e 1.0.
+        """
+        return self.next() / 0x10000000000000000
+\end{verbatim}
+
+\subsection{Implementação do Teste}
+
+\begin{verbatim}
+"""
+Experimento para avaliação de desempenho de geradores de números pseudoaleatórios.
+
+Este script avalia o tempo necessário para gerar números pseudoaleatórios de diferentes
+tamanhos (40-4096 bits) usando diferentes implementações do algoritmo Xorshift.
+
+O experimento gera múltiplos números para cada tamanho e calcula o tempo médio.
+"""
+
+import time
+import sys
+from main import Xorshift32, Xorshift64, Xorshift128, Xorshift128Plus
+
+# Tamanhos de bits a serem testados
+BIT_SIZES = [40, 56, 80, 128, 168, 224, 256, 512, 1024, 2048, 4096]
+
+# Número de amostras para calcular o tempo médio
+NUM_SAMPLES = 1000
+
+
+def generate_random_bits(generator, num_bits):
+    """
+    Gera um número pseudoaleatório com o número especificado de bits.
+    
+    Args:
+        generator: Objeto gerador Xorshift
+        num_bits: Número de bits desejado
+    
+    Returns:
+        int: Número pseudoaleatório com o tamanho especificado
+    """
+    result = 0
+    bits_generated = 0
+    
+    # Determina o número de bits por chamada com base no tipo de gerador
+    if isinstance(generator, Xorshift32):
+        bits_per_call = 32
+    elif isinstance(generator, Xorshift64) or isinstance(generator, Xorshift128Plus):
+        bits_per_call = 64
+    elif isinstance(generator, Xorshift128):
+        bits_per_call = 32
+    else:
+        raise ValueError("Gerador não reconhecido")
+    
+    # Gera bits até atingir o tamanho desejado
+    while bits_generated < num_bits:
+        # Gera um novo número
+        new_bits = generator.next()
+        
+        # Adiciona os novos bits ao resultado (shifts e OR)
+        result = (result << bits_per_call) | new_bits
+        bits_generated += bits_per_call
+    
+    # Ajusta para o tamanho exato solicitado (remove bits extras)
+    if bits_generated > num_bits:
+        extra_bits = bits_generated - num_bits
+        result = result >> extra_bits
+        
+    # Garante que o número tenha exatamente o número de bits solicitado
+    # Seta o bit mais significativo para 1
+    result |= (1 << (num_bits - 1))
+    
+    return result
+
+
+def measure_generation_time(generator_class, bit_size, seed=42):
+    """
+    Mede o tempo médio para gerar números pseudoaleatórios de determinado tamanho.
+    
+    Args:
+        generator_class: Classe do gerador a ser usada
+        bit_size: Tamanho do número em bits
+        seed: Semente para inicializar o gerador
+    
+    Returns:
+        float: Tempo médio em milissegundos
+    """
+    # Inicializa o gerador apropriadamente dependendo da classe
+    if generator_class == Xorshift32 or generator_class == Xorshift64:
+        generator = generator_class(seed=seed)
+    elif generator_class == Xorshift128:
+        generator = generator_class(seed=[seed, seed+1, seed+2, seed+3])
+    elif generator_class == Xorshift128Plus:
+        generator = generator_class(seed=[seed, seed+1])
+    
+    # Mede o tempo total para gerar NUM_SAMPLES números
+    start_time = time.time()
+    
+    for _ in range(NUM_SAMPLES):
+        generate_random_bits(generator, bit_size)
+    
+    end_time = time.time()
+    
+    # Calcula o tempo médio em milissegundos
+    avg_time_ms = ((end_time - start_time) / NUM_SAMPLES) * 1000
+    
+    return avg_time_ms
+
+
+def run_experiment():
+    """
+    Executa o experimento completo e exibe os resultados em formato de tabela.
+    """
+    generators = [
+        ("Xorshift32", Xorshift32),
+        ("Xorshift64", Xorshift64),
+        ("Xorshift128", Xorshift128),
+        ("Xorshift128Plus", Xorshift128Plus)
+    ]
+    
+    # Imprime o cabeçalho da tabela
+    print("\n" + "=" * 80)
+    print(f"{'Algoritmo':<20} | {'Tamanho do Número':<20} | {'Tempo para gerar (ms)':<20}")
+    print("-" * 80)
+    
+    # Executa o experimento para cada combinação de gerador e tamanho
+    for gen_name, gen_class in generators:
+        for bit_size in BIT_SIZES:
+            # Mede o tempo de geração
+            time_ms = measure_generation_time(gen_class, bit_size)
+            
+            # Formata e imprime o resultado
+            print(f"{gen_name:<20} | {bit_size} bits{' ':<14} | {time_ms:.4f} ms")
+        
+        # Linha separadora entre geradores
+        print("-" * 80)
+    
+    print("=" * 80)
+    print(f"Experimento concluído. Cada medição representa a média de {NUM_SAMPLES} execuções.")
+
+
+def verify_random_number_quality(show_numbers=False):
+    """
+    Verifica a qualidade dos números gerados por cada algoritmo.
+    Esta função é útil para validar se os números gerados têm o tamanho especificado.
+    
+    Args:
+        show_numbers: Se True, exibe os números gerados para inspeção visual
+    """
+    print("\nVerificação da qualidade dos números gerados:")
+    print("-" * 80)
+    
+    generators = [
+        ("Xorshift32", Xorshift32(seed=42)),
+        ("Xorshift64", Xorshift64(seed=42)),
+        ("Xorshift128", Xorshift128(seed=[42, 43, 44, 45])),
+        ("Xorshift128Plus", Xorshift128Plus(seed=[42, 43]))
+    ]
+    
+    # Seleciona alguns tamanhos para testar
+    test_sizes = [40, 128, 256, 1024]
+    
+    for gen_name, generator in generators:
+        print(f"\nGerador: {gen_name}")
+        
+        for bit_size in test_sizes:
+            number = generate_random_bits(generator, bit_size)
+            
+            # Verifica se o número tem o tamanho correto (em bits)
+            binary = bin(number)[2:]  # Remove o prefixo '0b'
+            actual_bits = len(binary)
+            
+            print(f"  Tamanho solicitado: {bit_size} bits")
+            print(f"  Tamanho real: {actual_bits} bits")
+            
+            if show_numbers:
+                # Limita a exibição para evitar números muito grandes
+                if bit_size <= 128:
+                    print(f"  Número binário: {binary}")
+                else:
+                    print(f"  Número binário: {binary[:64]}...{binary[-64:]} (parte inicial e final)")
+            
+            print("-" * 40)
+
+
+if __name__ == "__main__":
+    # Verifica se o usuário quer executar o experimento com verificação de qualidade
+    verify_quality = len(sys.argv) > 1 and sys.argv[1] == "--verify"
+    
+    if verify_quality:
+        verify_random_number_quality(show_numbers=True)
+    else:
+        print("\nIniciando experimento de geração de números pseudoaleatórios...")
+        print(f"Gerando {NUM_SAMPLES} amostras para cada combinação algoritmo-tamanho")
+        run_experiment()
+        print("\nDica: Execute com a flag --verify para testar a qualidade dos números gerados.")
+\end{verbatim}

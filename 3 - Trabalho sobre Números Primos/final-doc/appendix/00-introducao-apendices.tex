@@ -1,0 +1,30 @@
+\appendix
+
+\chapter{Apêndices}
+
+Os apêndices deste trabalho contêm as implementações detalhadas dos algoritmos discutidos nos capítulos anteriores. Eles estão organizados da seguinte forma:
+
+\begin{itemize}
+    \item \textbf{Apêndice A: Implementações dos Geradores de Números Pseudoaleatórios}
+    \begin{itemize}
+        \item Seção \ref{apx:xorshift-impl}: Implementação do algoritmo Xorshift e suas variantes (32 bits, 64 bits, 128 bits e 128+ bits)
+        \item Seção \ref{apx:bbs-impl}: Implementação do algoritmo Blum Blum Shub
+    \end{itemize}
+    
+    \item \textbf{Apêndice B: Implementações dos Testes de Primalidade}
+    \begin{itemize}
+        \item Seção \ref{apx:fermat-impl}: Implementação do Teste de Primalidade de Fermat
+        \item Seção \ref{apx:miller-rabin-impl}: Implementação do Teste de Primalidade de Miller-Rabin
+    \end{itemize}
+\end{itemize}
+
+Cada seção dos apêndices contém tanto a implementação do algoritmo em si quanto o código utilizado para os experimentos, permitindo a reprodução de todos os resultados apresentados nos capítulos principais. Os códigos estão documentados com comentários que explicam cada etapa do processo.
+
+As implementações foram desenvolvidas em Python, escolhido pela sua facilidade de manipulação de números grandes e clareza sintática, características essenciais para algoritmos criptográficos e testes de primalidade. Todos os códigos foram projetados visando o equilíbrio entre legibilidade e eficiência, com otimizações específicas para operações críticas como exponenciação modular.
+
+Para executar os experimentos, basta utilizar os arquivos de teste correspondentes a cada implementação, que já estão configurados com os parâmetros necessários para reproduzir os resultados apresentados neste trabalho.
+
+\input{appendix/01-xorshift.tex}
+\input{appendix/02-blum-blum-shub.tex} 
+\input{appendix/03-fermat-primality-test.tex}
+\input{appendix/04-miller-rabin.tex}

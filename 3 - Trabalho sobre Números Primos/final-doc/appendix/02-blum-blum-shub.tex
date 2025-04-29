@@ -1,0 +1,363 @@
+\section{Blum Blum Shub}\label{apx:bbs-impl}
+
+\subsection{Implementação do Algoritmo}
+
+\begin{verbatim}
+"""
+Implementação do algoritmo Blum Blum Shub (BBS) para geração de números pseudoaleatórios.
+
+BBS é um gerador de números pseudoaleatórios criptograficamente seguro proposto em 1986
+por Lenore Blum, Manuel Blum e Michael Shub. Sua segurança baseia-se na dificuldade
+do problema de fatoração de inteiros.
+"""
+
+import random
+import math
+import time
+from typing import Tuple, Optional
+
+
+def is_prime(n: int, k: int = 40) -> bool:
+    """
+    Verifica se um número é provavelmente primo usando o teste de Miller-Rabin.
+    
+    Args:
+        n: O número a ser testado
+        k: Número de iterações para o teste (maior k = maior confiabilidade)
+        
+    Returns:
+        bool: True se n for provavelmente primo, False caso contrário
+    """
+    # Casos básicos
+    if n <= 1:
+        return False
+    if n <= 3:
+        return True
+    if n % 2 == 0:
+        return False
+    
+    # Expressando n-1 como 2^r * d
+    r, d = 0, n - 1
+    while d % 2 == 0:
+        r += 1
+        d //= 2
+    
+    # Teste de Miller-Rabin
+    for _ in range(k):
+        a = random.randint(2, n - 2)
+        x = pow(a, d, n)
+        if x == 1 or x == n - 1:
+            continue
+        for _ in range(r - 1):
+            x = pow(x, 2, n)
+            if x == n - 1:
+                break
+        else:
+            return False
+    return True
+
+
+def generate_prime(bits: int) -> int:
+    """
+    Gera um número primo com o número especificado de bits.
+    
+    Args:
+        bits: Número de bits do primo a ser gerado
+        
+    Returns:
+        int: Um número primo com o número especificado de bits
+    """
+    while True:
+        # Gera um número aleatório com o número especificado de bits
+        p = random.randint(2**(bits-1), 2**bits - 1)
+        
+        # Garante que o número é ímpar
+        if p % 2 == 0:
+            p += 1
+        
+        # Verifica se é primo usando o teste de Miller-Rabin
+        if is_prime(p):
+            return p
+
+
+def generate_blum_integer(bits: int) -> Tuple[int, int, int]:
+    """
+    Gera um inteiro de Blum, que é o produto de dois primos grandes, ambos
+    congruentes a 3 mod 4.
+    
+    Args:
+        bits: Número de bits para cada primo (o inteiro de Blum terá aproximadamente 2*bits)
+        
+    Returns:
+        Tuple[int, int, int]: (n, p, q) onde n = p * q é o inteiro de Blum
+    """
+    # Gera o primeiro primo p tal que p \equiv 3 (mod 4)
+    while True:
+        p = generate_prime(bits)
+        if p % 4 == 3:
+            break
+    
+    # Gera o segundo primo q tal que q \equiv 3 (mod 4)
+    while True:
+        q = generate_prime(bits)
+        if q % 4 == 3 and p != q:  # Garante que p e q são diferentes
+            break
+    
+    # Retorna o inteiro de Blum n = p * q
+    return p * q, p, q
+
+
+def gcd(a: int, b: int) -> int:
+    """
+    Calcula o Máximo Divisor Comum (MDC) entre dois números.
+    
+    Args:
+        a: Primeiro número
+        b: Segundo número
+        
+    Returns:
+        int: O MDC entre a e b
+    """
+    while b:
+        a, b = b, a % b
+    return a
+
+
+class BlumBlumShub:
+    """
+    Implementação do gerador de números pseudoaleatórios Blum Blum Shub.
+    """
+    
+    def __init__(self, seed: Optional[int] = None, n: Optional[int] = None, 
+                 p: Optional[int] = None, q: Optional[int] = None, bits: int = 512):
+        """
+        Inicializa o gerador BBS.
+        
+        Args:
+            seed: Semente inicial para o gerador (opcional)
+            n: O inteiro de Blum a ser usado (opcional)
+            p: Primeiro primo utilizado na geração de n (opcional)
+            q: Segundo primo utilizado na geração de n (opcional)
+            bits: Número de bits para cada um dos primos (se n não for fornecido)
+        """
+        # Se n não foi fornecido, gera um novo inteiro de Blum
+        if n is None:
+            self.n, self.p, self.q = generate_blum_integer(bits)
+        else:
+            # Usa os valores fornecidos
+            self.n = n
+            self.p = p
+            self.q = q
+        
+        # Se a semente não foi fornecida, gera uma aleatória
+        if seed is None:
+            # Gera uma semente aleatória coprima com n
+            while True:
+                seed = random.randint(2, self.n - 1)
+                if gcd(seed, self.n) == 1:
+                    break
+        else:
+            # Verifica se a semente fornecida é válida
+            if seed <= 1 or seed >= self.n:
+                raise ValueError("A semente deve estar no intervalo [2, n-1]")
+            if gcd(seed, self.n) != 1:
+                raise ValueError("A semente deve ser coprima com n")
+        
+        # Inicializa o estado com x_0 = s^2 mod n
+        self.state = (seed * seed) % self.n
+    
+    def next_bit(self) -> int:
+        """
+        Gera o próximo bit pseudoaleatório.
+        
+        Returns:
+            int: 0 ou 1 (o bit menos significativo do novo estado)
+        """
+        # Calcula x_{i+1} = x_i² mod n
+        self.state = (self.state * self.state) % self.n
+        
+        # Retorna o bit menos significativo
+        return self.state % 2
+    
+    def next_byte(self) -> int:
+        """
+        Gera o próximo byte (8 bits) pseudoaleatório.
+        
+        Returns:
+            int: Um número entre 0 e 255
+        """
+        byte = 0
+        # Gera 8 bits para formar um byte
+        for i in range(8):
+            bit = self.next_bit()
+            # Constrói o byte bit a bit (do mais significativo para o menos)
+            byte = (byte << 1) | bit
+        return byte
+    
+    def random_bits(self, num_bits: int) -> int:
+        """
+        Gera um número com a quantidade especificada de bits.
+        
+        Args:
+            num_bits: Número de bits a serem gerados
+            
+        Returns:
+            int: Um número pseudoaleatório com o tamanho especificado
+        """
+        result = 0
+        # Gera os bits um a um
+        for _ in range(num_bits):
+            bit = self.next_bit()
+            # Constrói o número bit a bit
+            result = (result << 1) | bit
+        
+        # Garante que o bit mais significativo seja 1 (para garantir exatamente num_bits bits)
+        result |= (1 << (num_bits - 1))
+        
+        return result
+    
+    def random(self) -> float:
+        """
+        Gera um número de ponto flutuante pseudoaleatório no intervalo [0.0, 1.0).
+        
+        Returns:
+            float: Um número entre 0.0 e 1.0
+        """
+        # Usa 53 bits para garantir precisão suficiente para um float
+        return self.random_bits(53) / (1 << 53)
+\end{verbatim}
+
+\subsection{Implementação do Teste}
+
+\begin{verbatim}
+"""
+Experimento para avaliar o desempenho do gerador de números pseudoaleatórios Blum Blum Shub.
+
+Este script mede o tempo necessário para gerar números pseudoaleatórios de diferentes
+tamanhos (40-4096 bits) usando o algoritmo Blum Blum Shub (BBS).
+"""
+
+import time
+import sys
+from main import BlumBlumShub
+
+# Tamanhos de bits a serem testados
+BIT_SIZES = [40, 56, 80, 128, 168, 224, 256, 512, 1024, 2048, 4096]
+
+# Número de amostras para calcular o tempo médio
+NUM_SAMPLES = 10  # Menos amostras para BBS porque é muito mais lento
+
+
+def measure_generation_time(bit_size):
+    """
+    Mede o tempo médio para gerar números pseudoaleatórios de determinado tamanho.
+    
+    Args:
+        bit_size: Tamanho do número em bits
+    
+    Returns:
+        float: Tempo médio em milissegundos
+    """
+    # Inicializa o gerador BBS com um módulo de tamanho adequado
+    # O tamanho do módulo deve ser pelo menos duas vezes maior que o do número a ser gerado
+    module_bits = max(512, bit_size * 2)
+    
+    # Medimos também o tempo de inicialização
+    init_start_time = time.time()
+    bbs = BlumBlumShub(bits=module_bits // 2)
+    init_time = (time.time() - init_start_time) * 1000  # em ms
+    
+    # Mede o tempo total para gerar NUM_SAMPLES números
+    total_time = 0
+    
+    for _ in range(NUM_SAMPLES):
+        start_time = time.time()
+        bbs.random_bits(bit_size)
+        end_time = time.time()
+        total_time += (end_time - start_time) * 1000  # em ms
+    
+    # Calcula o tempo médio em milissegundos
+    avg_time_ms = total_time / NUM_SAMPLES
+    
+    return avg_time_ms, init_time
+
+
+def run_experiment():
+    """
+    Executa o experimento completo e exibe os resultados em formato de tabela.
+    """
+    print("\n" + "=" * 80)
+    print("Experimento de geração de números pseudoaleatórios com Blum Blum Shub (BBS)")
+    print("=" * 80)
+    print(f"{'Tamanho do Número':<20} | {'Tempo de Init (ms)':<20} | {'Tempo de Geração (ms)':<25}")
+    print("-" * 80)
+    
+    # Executa o experimento para cada tamanho
+    for bit_size in BIT_SIZES:
+        try:
+            # Mede o tempo de geração
+            gen_time_ms, init_time_ms = measure_generation_time(bit_size)
+            
+            # Formata e imprime o resultado
+            print(f"{bit_size} bits{' ':<14} | {init_time_ms:.4f} ms{' ':<10} | {gen_time_ms:.4f} ms")
+            
+            # Salva o resultado parcial para não perder progresso
+            with open("bbs_results.txt", "a") as f:
+                f.write(f"{bit_size},{init_time_ms:.4f},{gen_time_ms:.4f}\n")
+                
+        except Exception as e:
+            print(f"{bit_size} bits{' ':<14} | ERRO: {str(e)}")
+    
+    print("=" * 80)
+    print(f"Experimento concluído. Cada medição representa a média de {NUM_SAMPLES} execuções.")
+
+
+def verify_random_number_quality():
+    """
+    Verifica a qualidade dos números gerados pelo algoritmo BBS.
+    Esta função é útil para validar se os números gerados têm o tamanho especificado.
+    """
+    print("\nVerificação da qualidade dos números gerados pelo Blum Blum Shub:")
+    print("-" * 80)
+    
+    # Cria um gerador BBS
+    bbs = BlumBlumShub(bits=512)
+    
+    # Seleciona alguns tamanhos para testar
+    test_sizes = [40, 128, 256]
+    
+    for bit_size in test_sizes:
+        print(f"\nGerando número de {bit_size} bits...")
+        number = bbs.random_bits(bit_size)
+        
+        # Verifica se o número tem o tamanho correto
+        binary = bin(number)[2:]  # Remove o prefixo '0b'
+        actual_bits = len(binary)
+        
+        print(f"  Tamanho solicitado: {bit_size} bits")
+        print(f"  Tamanho real: {actual_bits} bits")
+        print(f"  Número binário: {binary}")
+        print(f"  Número decimal: {number}")
+        
+        # Verificação simples da distribuição de bits
+        ones = binary.count('1')
+        zeros = binary.count('0')
+        print(f"  Distribuição: {ones} bits '1' ({ones/actual_bits:.2%}), {zeros} bits '0' ({zeros/actual_bits:.2%})")
+        
+        print("-" * 40)
+
+
+if __name__ == "__main__":
+    # Verifica se o usuário quer executar o experimento ou testar a qualidade
+    verify_quality = len(sys.argv) > 1 and sys.argv[1] == "--verify"
+    
+    if verify_quality:
+        verify_random_number_quality()
+    else:
+        print("\nIniciando experimento com Blum Blum Shub...")
+        print(f"Gerando {NUM_SAMPLES} amostras para cada tamanho de bits")
+        print("Nota: Este algoritmo é significativamente mais lento que outros PRNGs.")
+        print("      O experimento pode levar vários minutos ou até horas para completar.")
+        run_experiment()
+        print("\nDica: Execute com a flag --verify para testar a qualidade dos números gerados.")
+\end{verbatim}
