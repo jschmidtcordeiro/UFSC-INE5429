@@ -1,0 +1,23 @@
+\chapter{Introdução}
+
+O Pretty Good Privacy (PGP) é um sistema de criptografia que proporciona privacidade e autenticação para comunicações digitais. Desenvolvido por Phil Zimmermann em 1991, o PGP tornou-se um padrão mundial para segurança de e-mails e proteção de arquivos, evoluindo para o padrão OpenPGP (RFC 4880) \cite{rfc4880}.
+
+Este trabalho apresenta uma análise prática dos principais aspectos do PGP, com ênfase na implementação GnuPG. Através de experimentos detalhados, são demonstrados os processos essenciais do ciclo de vida de certificados digitais PGP, desde sua criação até a revogação, além de procedimentos relacionados à criptografia e assinatura digital.
+
+A segurança proporcionada pelo PGP baseia-se na criptografia de chave pública (assimétrica), onde cada usuário possui um par de chaves: uma pública, que pode ser amplamente distribuída, e uma privada, que deve ser mantida em sigilo. Este modelo permite tanto a criptografia de mensagens quanto a assinatura digital, garantindo confidencialidade, integridade, autenticidade e não-repúdio nas comunicações digitais.
+
+Os experimentos realizados neste trabalho abordam quatro aspectos fundamentais:
+
+\begin{enumerate}
+    \item \textbf{Criação de certificados PGP}: Processo de geração de chaves, backup, publicação em servidores e utilização para criptografia e assinatura digital.
+    
+    \item \textbf{Revogação de certificados}: Procedimentos para invalidar certificados emitidos anteriormente, essencial quando há comprometimento da chave privada ou mudança de informações do usuário.
+    
+    \item \textbf{Revogação de assinaturas}: Mecanismos para retirar a confiança anteriormente atribuída à chave de outro usuário, importante componente da Web of Trust do PGP.
+    
+    \item \textbf{Aspectos teórico-práticos}: Respostas a questões específicas sobre o funcionamento interno do PGP, incluindo estruturas de dados, modelos de confiança e aplicações práticas.
+\end{enumerate}
+
+Cada capítulo apresenta experimentos práticos com comandos e resultados documentados, permitindo a reprodução das operações e facilitando o entendimento dos conceitos subjacentes. Os experimentos foram realizados utilizando o GnuPG (GNU Privacy Guard), uma implementação livre do OpenPGP, em ambiente macOS.
+
+A importância deste estudo reside no fato de que, mesmo após mais de três décadas de sua criação, o PGP continua sendo uma tecnologia fundamental para comunicações seguras, especialmente em um cenário de crescente vigilância digital e preocupações com privacidade. Compreender seus mecanismos, limitações e aplicações práticas é essencial para profissionais de segurança da informação e usuários conscientes sobre privacidade digital.

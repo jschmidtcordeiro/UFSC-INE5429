@@ -1,0 +1,31 @@
+\chapter{Conclusão}
+
+Este trabalho apresentou uma série de experimentos práticos sobre o Pretty Good Privacy (PGP), demonstrando os principais aspectos de seu funcionamento e aplicação. Através da manipulação direta do GnuPG, foi possível compreender em profundidade os mecanismos que sustentam esta tecnologia de criptografia amplamente utilizada.
+
+Os experimentos realizados abrangeram todo o ciclo de vida dos certificados PGP:
+
+\begin{itemize}
+    \item A criação de certificados PGP, com a geração de pares de chaves, exportação, backup e publicação em servidores;
+    \item A revogação de certificados, essencial quando há comprometimento da chave privada ou mudança de informações do usuário;
+    \item O processo de assinatura de chaves de terceiros e a posterior revogação dessas assinaturas, elementos fundamentais para o funcionamento da Web of Trust;
+    \item A utilização prática do PGP para criptografar arquivos e assinar documentos, demonstrando sua aplicabilidade cotidiana.
+\end{itemize}
+
+Além dos aspectos práticos, foram explorados conceitos teóricos importantes como a estrutura do anel de chaves privadas, a organização do banco de dados de confiabilidade, o propósito das subchaves e os requisitos para criação e manutenção de servidores de chaves PGP.
+
+Os experimentos confirmaram a eficácia do PGP em fornecer:
+
+\begin{enumerate}
+    \item \textbf{Confidencialidade}: Através da criptografia, garantindo que apenas o destinatário pretendido possa acessar o conteúdo da mensagem;
+    \item \textbf{Integridade}: Assegurando que o conteúdo não seja alterado durante a transmissão;
+    \item \textbf{Autenticidade}: Confirmando a identidade do remetente por meio de assinaturas digitais;
+    \item \textbf{Não-repúdio}: Impedindo que o signatário negue posteriormente a autoria da mensagem assinada.
+\end{enumerate}
+
+Também ficou evidente que, apesar de sua robustez criptográfica, a eficácia do PGP depende criticamente da gestão adequada das chaves, especialmente da proteção das chaves privadas. A possibilidade de revogação de certificados e assinaturas mostrou-se um mecanismo crucial de segurança, permitindo responder a incidentes como o comprometimento de chaves.
+
+Os desafios encontrados durante os experimentos, como a complexidade da interface de linha de comando do GnuPG e a dificuldade em verificar o status de chaves em servidores, refletem alguns dos obstáculos que contribuem para a adoção limitada do PGP entre usuários comuns, apesar de suas vantagens técnicas.
+
+É importante ressaltar que o PGP, mesmo com mais de três décadas desde sua criação, continua sendo uma ferramenta relevante no cenário atual de crescente vigilância digital e ameaças à privacidade. O conhecimento adquirido neste trabalho não apenas fornece habilidades técnicas específicas, mas também contribui para uma compreensão mais ampla dos princípios de criptografia de chave pública e privacidade digital.
+
+Concluímos que, apesar dos desafios de usabilidade, o PGP permanece como uma solução robusta para segurança de comunicações, especialmente em contextos que exigem alto nível de confidencialidade e autenticidade. O conjunto de experimentos realizados fornece uma base sólida para futuras explorações e aplicações práticas desta tecnologia, seja em contextos pessoais, acadêmicos ou profissionais relacionados à segurança da informação.
